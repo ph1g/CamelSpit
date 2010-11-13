@@ -63,7 +63,7 @@ sub send_fake_cookie {
 		"ip" => {
 			"saddr" => unpack("N",inet_aton($srcip)),
 			"daddr" => $dstip,
-			"ttl"   => 3
+			"ttl"   => 2
 		},
 		"tcp" => {
 			"dest"   => 80,
