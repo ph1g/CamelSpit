@@ -3,13 +3,39 @@ use strict;
 use warnings;
 use Net::RawIP;
 use Socket;
+# Copyright (C) 2010 Benjamin Small
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 
 # The src doesn't really matter, but feel free to change it if
 # you'd like. 
 my $srcip = "172.16.1.104";
 
+die "Must run as root" if $>;
+
+$|=1; # need autoflush on to display packet progress
+
+my $i = 7;
 while(1) {
 	&send_fake_cookie($srcip, "www.facebook.com");
+	if($i++%6) {
+		print "#";
+	} 
+	else {
+		print "\b" x 6;
+	}
 	sleep 1;
 }
 
@@ -20,7 +46,7 @@ sub send_fake_cookie {
 	$dstip = unpack("N", inet_aton($dstip)) if $dstip =~ /[^0-9]+.[^0-9]+.[^0-9]+.[^0-9]+/;
 
 	my $fs_payload = "";
-	$fs_payload .= "GET /packetSniffingKillsKittens HTTP/1.1\r\n";
+	$fs_payload .= "GET /pleaseSecureWebServices HTTP/1.1\r\n";
 	$fs_payload .= "Host: www.facebook.com\r\n";
 	$fs_payload .= "User-Agent: Mozilla\r\n";
 	$fs_payload .= "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\n";
@@ -42,7 +68,7 @@ sub send_fake_cookie {
 		"tcp" => {
 			"dest"   => 80,
 			"source" => (rand((65535 - 1024)) -  1024),
-			"data"   => $crash_fs_payload,
+			"data"   => $fs_payload,
 			"ack"    => 1
 		}
 	});
